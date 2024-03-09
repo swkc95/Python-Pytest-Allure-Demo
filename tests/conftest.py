@@ -6,15 +6,20 @@ from lib.misc.string_importer import import_string_file
 from datetime import datetime
 
 
-@pytest.fixture()
-def browser():
+@pytest.fixture
+def browser(request):
+    debug_mode = request.config.getoption("--test-debug")
+
     options = webdriver.ChromeOptions()
-    # options.add_experimental_option("detach", True)
-    options.add_argument('--headless')
-    _browser = webdriver.Chrome(options=options)
-    _browser.maximize_window()
-    yield _browser
-    _browser.quit()
+    options.add_experimental_option("detach", not debug_mode)
+    if not debug_mode:
+        options.add_argument('--headless')
+    browser = webdriver.Chrome(options=options)
+    browser.maximize_window()
+
+    yield browser
+    if not debug_mode:
+        browser.quit()
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -30,7 +35,14 @@ def pytest_runtest_makereport(item, call):
         os.remove(screenshot_path)
 
 
-@pytest.fixture()
-def strings():
-    _strings = import_string_file("english")
-    return _strings
+@pytest.fixture
+def strings(request):
+    language = request.config.getoption("--lang")
+    strings = import_string_file(language)
+    return strings
+
+
+def pytest_addoption(parser):
+    parser.addoption("--lang", action="store", default="english", help="Choose language strings")
+    parser.addoption("--test-debug", action="store_true", default=False,
+                     help="Debug mode - visible browser, stays open after the test")
