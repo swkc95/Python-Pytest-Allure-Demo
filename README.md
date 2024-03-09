@@ -39,7 +39,8 @@ API requests, provided by the popular Python "requests" library, were utilized t
 
 ## Usage
 ### Running tests
-Run `pytest` in project directory to launch the full test suite. By default, it will run tests in 2 parallel processes, in headless mode. 
+Run `pytest` in project directory to launch the full test suite. By default, it will run tests in 2 parallel processes, in headless mode.
+
 Run `allure serve ./reportallure/` to generate Allure report after finished tests.
 
 #### Using tags
